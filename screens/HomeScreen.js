@@ -4,7 +4,7 @@ import { Text, StyleSheet, View } from 'react-native';
 const HomeScreen = () => {
 
     return (
-      <View>
+      <View style={styles.text}>
         <Text>Home Screen</Text>
       </View>
     )
@@ -13,6 +13,12 @@ const HomeScreen = () => {
 
   export default HomeScreen;
   
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  text:{
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: 20,
+  }
+})
 
 
