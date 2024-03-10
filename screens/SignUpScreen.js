@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, {  useState ,useRef} from "react";
+import { Formik, Field } from 'formik';
+import * as yup from 'yup';
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   Text,
@@ -22,13 +24,18 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const formikRef = useRef(null); // Create a ref to hold the Formik instance
 
    // Function to clear email and password fields
    const clearFields = () => {
     setEmail("");
     setPassword("");
+    // Reset Formik form
+    if (formikRef.current) {
+      formikRef.current.resetForm();
+    }
   };
-
+  
   // Clear fields when component is focused
   useFocusEffect(
     React.useCallback(() => {
@@ -36,32 +43,16 @@ const SignUpScreen = () => {
     }, [])
   );
 
+  const handleSignUp = (values) => {
+    
+    const { email, password } = values;
 
-useEffect(() =>{
-  const unsubscribe = auth.onAuthStateChanged(user =>{
-    if(user){
-      navigation.navigate('Home');
-    }
-  })
-  return unsubscribe
-},[])
-
-  const handleSignUp = () => {
-      // Check if email and password are not empty
-  if (!email) {
-    Alert.alert('Error', 'Please enter your email.');
-    return;
-  }
-
-  if (!password) {
-    Alert.alert('Error', 'Please enter your password.');
-    return;
-  }
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed up
         const user = userCredential.user;
         Alert.alert('Success', 'Account created successfully!');
+        navigation.navigate('Home');
         console.log(user.email);
       
       })
@@ -75,38 +66,63 @@ useEffect(() =>{
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView style={styles.container} behavior="padding">
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
-            style={styles.input}
-          />
 
-          <TextInput
-            placeholder="Passwoord"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
-            style={styles.input}
-            keyboardType="numeric"
-            secureTextEntry
-          />
-        </View>
+        <Formik
+          initialValues={{ email: '', password: '' }}
+          onSubmit={(values) => handleSignUp(values)}
+          validationSchema={validationSchema}
+          innerRef={formikRef} // Assign the ref to the Formik instance
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            <View>
+              <View style={styles.inputContainer}>
+                <Field
+                  component={TextInput}
+                  name="email"
+                  placeholder="Email"
+                  style = {[styles.input, { width: 300 }]}
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  value={values.email}
+                />
+                {touched.email && errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
+                <Field
+                  component={TextInput}
+                  name="password"
+                  placeholder="Password"
+                  style = {[styles.input, { width: 300 }]}
+                  onChangeText={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  value={values.password}
+                  secureTextEntry
+                  keyboardType="numeric"
+                />
+                {touched.password && errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+              </View>
 
-          <Text style={styles.signUpText} onPress={() => {navigation.navigate('LoginScreen')}}>Already have an account? Sign In</Text>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity style={[styles.button,{width: 250}]} onPress={handleSubmit}>
+                  <Text style={styles.buttonText}>Sign Up</Text>
+                </TouchableOpacity>
 
-        </View>
+                <Text style={styles.signInText} onPress={() => { navigation.navigate('LoginScreen') }}>Already have an account? Sign In</Text>
+
+              </View>
+            </View>
+          )}
+        </Formik>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
 
 export default SignUpScreen;
+
+const validationSchema = yup.object().shape({
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required').min(8, 'Password must be at least 8 characters'),
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -128,8 +144,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "60%",
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 30,
     marginTop: 40,
     
   },
@@ -159,8 +174,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 
-  signUpText:{
+  signInText:{
     marginTop: 10,
-    color: 'white'
+    color: 'white',
+    paddingHorizontal: 20,
   }
 });

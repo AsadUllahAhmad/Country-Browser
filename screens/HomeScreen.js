@@ -18,8 +18,8 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
        <View style={styles.logoutButton}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText} onPress={() => {navigation.navigate('LoginScreen')}}>Logout</Text>
+          <TouchableOpacity>
+            <Text onPress={handleSignOut}>Logout</Text>
           </TouchableOpacity>
         </View>
       <View style={styles.content}>
@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
    
   },
   logoutButton: {
-    width: '15%',
+    width: '25%',
+    height: '5%',
     position: 'absolute',
     top: 60,
     right: 20,
