@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef } from "react";
 import { Formik, Field } from "formik";
-import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as yup from "yup";
 import { color } from "../assets/color/color";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   Text,
   StyleSheet,
@@ -16,22 +16,22 @@ import {
 } from "react-native";
 import { firebaseConfig, auth } from "../config/firebase";
 import { initializeApp } from "firebase/app";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-const LoginScreen = () => {
+const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const formikRef = useRef(null); // Create a ref to hold the Formik instance
 
   // Function to clear email and password fields
   const clearFields = () => {
     setEmail("");
     setPassword("");
     // Reset Formik form
-    formik.resetForm();
+    if (formikRef.current) {
+      formikRef.current.resetForm();
+    }
   };
 
   // Clear fields when component is focused
@@ -41,26 +41,31 @@ const LoginScreen = () => {
     }, [])
   );
 
-  const handleSignIn = (values) => {
+  const handleSignUp = (values) => {
     const { email, password } = values;
 
-    signInWithEmailAndPassword(auth, email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
+        // Signed up
         const user = userCredential.user;
-        // You can navigate or perform any other action here upon successful login
+        ToastAndroid.show("Account created successfully!", ToastAndroid.SHORT);
         navigation.navigate("Home");
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        if (
-          errorCode === "auth/user-not-found" ||
-          errorCode === "auth/wrong-password"
-        ) {
-          ToastAndroid.show("Invalid credentials.", ToastAndroid.SHORT);
+
+        if (errorCode === "auth/email-already-in-use") {
+          ToastAndroid.show(
+            "The email address is already in use by another account.",
+            ToastAndroid.SHORT
+          );
         } else {
-          ToastAndroid.show("Invalid credentials.", ToastAndroid.SHORT);
+          // Handle other errors
+          ToastAndroid.show(
+            "The email address is already in use by another account.",
+            ToastAndroid.SHORT
+          );
         }
       });
   };
@@ -70,9 +75,9 @@ const LoginScreen = () => {
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         <Formik
           initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => handleSignIn(values)}
-          validationSchema={validationSchema} // Define your validation schema here
-          innerRef={(formikRef) => (formik = formikRef)}
+          onSubmit={(values) => handleSignUp(values)}
+          validationSchema={validationSchema}
+          innerRef={formikRef}
         >
           {({
             handleChange,
@@ -118,16 +123,16 @@ const LoginScreen = () => {
                   style={[styles.button, { width: 250 }]}
                   onPress={handleSubmit}
                 >
-                  <Text style={styles.buttonText}>Login</Text>
+                  <Text style={styles.buttonText}>Sign Up</Text>
                 </TouchableOpacity>
 
                 <Text
-                  style={styles.signUpText}
+                  style={styles.signInText}
                   onPress={() => {
-                    navigation.navigate("SignUpScreen");
+                    navigation.navigate("LoginScreen");
                   }}
                 >
-                  Don't have an account? Sign Up
+                  Already have an account? Sign In
                 </Text>
               </View>
             </View>
@@ -138,11 +143,14 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default SignUpScreen;
 
 const validationSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters"),
 });
 
 const styles = StyleSheet.create({
@@ -181,10 +189,10 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontSize: 16,
   },
-  signUpText: {
+  signInText: {
     marginTop: 10,
     color: color.white_FFFFFF,
-    paddingHorizontal: 25,
+    paddingHorizontal: 20,
   },
   errorText: {
     color: color.red_FF0000,
