@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Formik, Field } from "formik";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import * as yup from "yup";
-import { color } from "../assets/color/color";
+import { color } from "../assets/color/colors";
 import {
   Text,
   StyleSheet,

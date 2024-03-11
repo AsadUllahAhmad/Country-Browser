@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Formik, Field } from "formik";
 import * as yup from "yup";
-import { color } from "../assets/color/color";
+import { color } from "../assets/color/colors";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   Text,
@@ -22,7 +22,7 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-  const formikRef = useRef(null); // Create a ref to hold the Formik instance
+  const formikRef = useRef(null);
 
   // Function to clear email and password fields
   const clearFields = () => {
