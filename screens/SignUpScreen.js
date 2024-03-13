@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Formik, Field } from "formik";
 import * as yup from "yup";
-import { color } from "../assets/color/color";
+import { color } from "../assets/color/colors";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import {
   Text,
@@ -22,7 +22,7 @@ const SignUpScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-  const formikRef = useRef(null); // Create a ref to hold the Formik instance
+  const formikRef = useRef(null);
 
   // Function to clear email and password fields
   const clearFields = () => {
@@ -97,6 +97,7 @@ const SignUpScreen = () => {
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   value={values.email}
+                  selectionColor = {color.drak_black_000000}
                 />
                 {touched.email && errors.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
@@ -112,6 +113,7 @@ const SignUpScreen = () => {
                   value={values.password}
                   secureTextEntry
                   keyboardType="numeric"
+                  selectionColor = {color.drak_black_000000}
                 />
                 {touched.password && errors.password && (
                   <Text style={styles.errorText}>{errors.password}</Text>
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: color.black_grey_222,
+    backgroundColor:color.black_grey_282f3c,
   },
   inputContainer: {
     width: "80%",
