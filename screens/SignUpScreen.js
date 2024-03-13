@@ -97,6 +97,7 @@ const SignUpScreen = () => {
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   value={values.email}
+                  selectionColor = {color.drak_black_000000}
                 />
                 {touched.email && errors.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
@@ -112,6 +113,7 @@ const SignUpScreen = () => {
                   value={values.password}
                   secureTextEntry
                   keyboardType="numeric"
+                  selectionColor = {color.drak_black_000000}
                 />
                 {touched.password && errors.password && (
                   <Text style={styles.errorText}>{errors.password}</Text>
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: color.black_grey_222,
+    backgroundColor:color.black_grey_282f3c,
   },
   inputContainer: {
     width: "80%",

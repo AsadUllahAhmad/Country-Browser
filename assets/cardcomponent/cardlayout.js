@@ -1,27 +1,54 @@
 import React from "react";
-import { View, StyleSheet, Text, Image, FlatList } from "react-native";
+import { View, StyleSheet, Text, Image, FlatList, TouchableOpacity } from "react-native";
 import { color } from "../color/colors";
 
-const Cardlayout = ({ data }) => {
+const Cardlayout = ({ data, onPress }) => {
   const renderItem = ({ item }) => (
+    <TouchableOpacity onPress={() => onPress(item)}>
     <View style={styles.shadowContainer}>
       <View style={styles.card}>
-        <Image source={item.image} style={styles.image} />
-        <Text style={styles.text}>{item.country}</Text>
-        <Text style={[styles.text, styles.textWithMarginTop]}>
-          {item.population}
+        <Image
+          source={
+            item.flags.png
+              ? { uri: item.flags.png }
+              : require("../images/flag.png")
+          }
+          style={styles.image}
+        />
+        <Text style={styles.text}>
+          {item.name.common ? item.name.common : "Germany"}
         </Text>
-        <Text style={styles.text}>Region: {item.region}</Text>
-        <Text style={styles.text}>Capital: {item.capital}</Text>
+        {item.population !== undefined ? (
+          <Text style={[styles.text, styles.textWithMarginTop]}>
+            Population: {item.population}
+          </Text>
+        ) : (
+          <Text style={[styles.text, styles.textWithMarginTop]}>
+            Population: 4475757575
+          </Text>
+        )}
+        {item.region ? (
+          <Text style={styles.text}>Region: {item.region}</Text>
+        ) : (
+          <Text style={styles.text}>Region: Berlin</Text>
+        )}
+        {item.capital ? (
+          <Text style={styles.text}>Capital: {item.capital}</Text>
+        ) : (
+          <Text style={styles.text}>Capital: Europe</Text>
+        )}
       </View>
     </View>
+    </TouchableOpacity>
   );
 
   return (
     <FlatList
       data={data}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={(item, index) =>
+        item && item.id ? item.id.toString() : index.toString()
+      }
     />
   );
 };
@@ -44,6 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     margin: 16,
     width: 250,
+    backgroundColor: "#5b6469",
   },
   image: {
     width: 250,
@@ -59,6 +87,7 @@ const styles = StyleSheet.create({
     color: color.white_FFFFFF,
     textAlign: "left",
     marginLeft: 20,
+    fontWeight: 'bold'
   },
   textWithMarginTop: {
     marginTop: 12,

@@ -13,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { firebaseConfig, auth } from "../config/firebase";
 import { initializeApp } from "firebase/app";
@@ -25,7 +26,7 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-
+  const [loading, setLoading] = useState(false);
   // Function to clear email and password fields
   const clearFields = () => {
     setEmail("");
@@ -43,6 +44,7 @@ const LoginScreen = () => {
 
   const handleSignIn = (values) => {
     const { email, password } = values;
+    setLoading(true);
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
@@ -62,6 +64,9 @@ const LoginScreen = () => {
         } else {
           ToastAndroid.show("Invalid credentials.", ToastAndroid.SHORT);
         }
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -92,6 +97,7 @@ const LoginScreen = () => {
                   onChangeText={handleChange("email")}
                   onBlur={handleBlur("email")}
                   value={values.email}
+                  selectionColor={color.drak_black_000000}
                 />
                 {touched.email && errors.email && (
                   <Text style={styles.errorText}>{errors.email}</Text>
@@ -107,6 +113,7 @@ const LoginScreen = () => {
                   value={values.password}
                   secureTextEntry
                   keyboardType="numeric"
+                  selectionColor={color.drak_black_000000}
                 />
                 {touched.password && errors.password && (
                   <Text style={styles.errorText}>{errors.password}</Text>
@@ -117,6 +124,7 @@ const LoginScreen = () => {
                 <TouchableOpacity
                   style={[styles.button, { width: 250 }]}
                   onPress={handleSubmit}
+                  disabled={loading}
                 >
                   <Text style={styles.buttonText}>Login</Text>
                 </TouchableOpacity>
@@ -129,6 +137,16 @@ const LoginScreen = () => {
                 >
                   Don't have an account? Sign Up
                 </Text>
+
+                {/* Loader view */}
+                {loading && (
+                  <View style={styles.loaderContainer}>
+                    <ActivityIndicator
+                      size="large"
+                      color={color.drak_black_000000}
+                    />
+                  </View>
+                )}
               </View>
             </View>
           )}
@@ -150,7 +168,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: color.black_grey_222,
+    backgroundColor: color.black_grey_282f3c,
   },
   inputContainer: {
     width: "80%",
